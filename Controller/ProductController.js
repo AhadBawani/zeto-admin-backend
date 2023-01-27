@@ -4,7 +4,7 @@ const Product = require('../Schemas/ProductSchema');
 module.exports.GET_ALL_PRODUCTS = (async (req, res) => {
     try {
         await Product.find()
-            .select('_id productName productImage sellerName price category description mrp discount disabled')
+            .select('_id productName productImage sellerName price category description mrp discount disabled mainCategory')
             .exec()
             .then(response => {
                 if (response) {
