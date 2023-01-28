@@ -246,7 +246,7 @@ module.exports.REMOVE_USER_CART = (async (req, res) => {
         UserCartSchema.findByIdAndDelete(req.params.cartId)
             .exec()
             .then(doc => {
-                if (doc.deletedCount > 0) {
+                if (doc) {
                     res.status(200).send({
                         message: "Deleted Successfully"
                     });
@@ -257,7 +257,9 @@ module.exports.REMOVE_USER_CART = (async (req, res) => {
                     })
                 }
             })
-            .catch();
+            .catch(error => {
+                console.log(error);
+            });
     }
     catch (err) {
         res.send("error : ", err);
