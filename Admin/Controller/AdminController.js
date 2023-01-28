@@ -46,7 +46,7 @@ module.exports.EDIT_PRODUCT = (async (req, res) => {
                             }
                         })
                         .catch(error => {
-                            console.log(error)
+                            res.status(400).send(error);
                         })
                 }
                 else {
@@ -79,28 +79,29 @@ module.exports.ADD_PRODUCT = ((req, res) => {
             disabled: req.body.disabled
         }).save();
 
-        product.then(response => {
-            if (response) {                
-                res.status(201).json({
-                    message: "Product Created Successfully!",
-                    product: {
-                        _id: product._id,
-                        productName: product.productName,
-                        productImage: product.productImage,
-                        price: product.price,
-                        sellerName: product.sellerName,
-                        category: product.category,
-                        mainCategory: product.mainCategory,
-                        description: product.description,
-                        mrp: product.mrp,
-                        discount: product.discount,
-                        disabled: product.disabled
-                    }
-                })
-            }
-        })
+        product
+            .then(response => {
+                if (response) {
+                    res.status(201).json({
+                        message: "Product Created Successfully!",
+                        product: {
+                            _id: product._id,
+                            productName: product.productName,
+                            productImage: product.productImage,
+                            price: product.price,
+                            sellerName: product.sellerName,
+                            category: product.category,
+                            mainCategory: product.mainCategory,
+                            description: product.description,
+                            mrp: product.mrp,
+                            discount: product.discount,
+                            disabled: product.disabled
+                        }
+                    })
+                }
+            })
             .catch(error => {
-                res.send(error);
+                res.status(400).send(error);
             })
     }
     catch (err) {

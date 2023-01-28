@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const utils = require('../Utils/utils');
 const UserEmailVerification = require('../Schemas/UserEmailVerification');
 const UserSchema = require('../Schemas/UserSchema');
+require('dotenv/config');
 
 module.exports.GET_ALL_USER = (async (req, res) => {
     try {
@@ -52,8 +53,7 @@ module.exports.LOGIN_USER = (async (req, res) => {
                         _id: response._id,
                         username: response.username,
                         email: response.email,
-                        phoneNumber: response.phoneNumber,
-                        password: response.password,
+                        phoneNumber: response.phoneNumber,                        
                         type: response.type
                     })
                 }
@@ -92,8 +92,7 @@ module.exports.SIGNUP_USER = (async (req, res) => {
                             _id: user._id,
                             username: user.username,
                             email: user.email,
-                            phoneNumber: user.phoneNumber,
-                            password: user.password
+                            phoneNumber: user.phoneNumber                            
                         }
                     })
                 }
@@ -188,7 +187,9 @@ module.exports.FORGOT_PASSWORD = (async (req, res) => {
                                                 });
                                         }
                                     })
-                                    .catch();
+                                    .catch(error => {
+                                        console.log(error);
+                                    });
                             }
                         })
                         .catch(error => {
@@ -310,5 +311,41 @@ module.exports.EDIT_USER = (async (req, res) => {
             })
     } catch (error) {
 
+    }
+})
+
+module.exports.ADMIN_SIGNUP = (async (req, res) => {
+    const { username, email, phoneNumber, password, adminKey } = req.body;
+    
+    try{
+        if(adminKey === process.env.ADMIN_KEY){
+            const user = new User({
+                username:username,
+                email:email,
+                phoneNumber:phoneNumber,
+                password:password,
+                type:"Admin"
+            }).save();
+
+            user
+            .then(response => {
+                if(response){
+                    res.status(201).send({
+                        message : "User created successfully!"
+                    })
+                }
+            })
+            .catch(error => {
+                res.status(400).send(error);
+            });
+        }
+        else{
+            res.status(400).send({
+                message : "Admin key not match!"
+            })
+        }
+    }
+    catch(error){
+        console.log(error);
     }
 })

@@ -6,9 +6,16 @@ module.exports.GET_CURRENT_RATE = (async (req, res) => {
         await DeliveryRate.findOne().sort({ _id: -1 })
             .exec()
             .then(response => {
-                res.status(200).send({
-                    rate : response.rate
-                })
+                if(response){
+                    res.status(200).send({
+                        rate : response.rate
+                    })
+                }
+                else{
+                    res.status(200).send({
+                        rate : 18
+                    })
+                }
             })
             .catch(error => {
                 console.log(error);
@@ -39,7 +46,7 @@ module.exports.CHANGE_DELIVERY_RATE = (async (req, res) => {
                             }
                         })
                         .catch(error => {
-                            console.log(erorr)
+                            res.status(400).send(error);
                         });
                 }
                 else {

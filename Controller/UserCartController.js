@@ -1,5 +1,7 @@
+const ProductSchema = require('../Schemas/ProductSchema');
 const UserCartSchema = require('../Schemas/UserCartSchema');
 const UserSchema = require('../Schemas/UserSchema');
+const utils = require('../Utils/utils');
 
 module.exports.GET_USER_CART = (async (req, res) => {
     try {
@@ -36,42 +38,117 @@ module.exports.GET_USER_CART = (async (req, res) => {
 })
 
 module.exports.ADD_USER_CART = (async (req, res) => {
-    let { userId, productId, quantity } = req.body;
+    const { userId, productId, quantity } = req.body;
 
     try {
-        UserCartSchema.findOne({ userId: userId, productId: productId })
+        await UserSchema.findById(userId)
             .exec()
-            .then(async response => {
-                if (!response) {
-                    const userCart = new UserCartSchema({
-                        userId: userId,
-                        productId: productId,
-                        quantity: quantity
-                    })
-                    try {
-                        await userCart.save();
-                        res.status(201).send({
-                            message: "Product added to the Cart!"
-                        });
-                    }
-                    catch (err) {
-                        res.send("error : ", err);
-                    }
-                }
-                else {                    
-                    UserCartSchema.
-                        findByIdAndUpdate(response.id, { $inc: { 'quantity': 1 } }, { new: true }, (error, response) => {
-                            if (response) {
-                                res.status(200).send({
-                                    message: "Updated Successfully"
-                                });
+            .then(userResponse => {
+                if (userResponse) {
+                    ProductSchema.findById(productId)
+                        .exec()
+                        .then(productResponse => {
+                            if (productResponse) {
+                                UserCartSchema.findOne({ userId: userId }).sort({ id: -1 })
+                                    .exec()
+                                    .then(userCartResponse => {
+                                        if (userCartResponse) {
+                                            if (userCartResponse.currentSellerId === productResponse.sellerID) {
+                                                if (userCartResponse.productId === productId) {
+                                                    UserCartSchema.
+                                                        findByIdAndUpdate(userCartResponse.id, { $inc: { 'quantity': 1 } }, { new: true }, (error, response) => {
+                                                            if (response) {
+                                                                res.status(200).send({
+                                                                    message: "Updated Successfully"
+                                                                });
+                                                            }
+                                                        })
+                                                }
+                                                else {
+                                                    const userCartAddResponse = utils.ADD_TO_CART(userId, productId, quantity, productResponse.sellerID);
+                                                    userCartAddResponse
+                                                        .then(response => {
+                                                            if (response) {
+                                                                res.status(200).send({
+                                                                    message: "Product added to the cart!"
+                                                                })
+                                                            }
+                                                        })
+                                                        .catch(error => {
+                                                            res.status(400).send(error);
+                                                        });
+                                                }
+                                            }
+                                            else {
+                                                UserCartSchema.remove({ userId: userId, currentSellerId: userCartResponse.currentSellerId })
+                                                    .exec()
+                                                    .then(response => {
+                                                        if (response.deletedCount > 0) {
+                                                            const userCartAddResponse = utils.ADD_TO_CART(userId, productId, quantity, productResponse.sellerID);
+                                                            userCartAddResponse
+                                                                .then(response => {
+                                                                    if (response) {
+                                                                        res.status(200).send({
+                                                                            message: "Product added to the cart!"
+                                                                        })
+                                                                    }
+                                                                })
+                                                                .catch(error => {
+                                                                    res.status(400).send(error);
+                                                                });
+                                                        }
+                                                    })
+                                                    .catch(error => {
+                                                        if (error) {
+                                                            console.log(error);
+                                                        }
+                                                    });
+                                            }
+                                        }
+                                        else {
+                                            const userCartAddResponse = utils.ADD_TO_CART(userId, productId, quantity, productResponse.sellerID);
+                                            userCartAddResponse
+                                                .then(response => {
+                                                    if (response) {
+                                                        res.status(200).send({
+                                                            message: "Product added to the cart!"
+                                                        })
+                                                    }
+                                                })
+                                                .catch(error => {
+                                                    res.status(400).send(error);
+                                                });
+                                        }
+                                    })
+                                    .catch(error => {
+                                        if (error) {
+                                            console.log(error);
+                                        }
+                                    });
+                            }
+                            else {
+                                res.status(404).send({
+                                    message: "Product not found!"
+                                })
                             }
                         })
+                        .catch(error => {
+                            if (error) {
+                                console.log(error)
+                            }
+                        });
+                }
+                else {
+                    res.status(404).send({
+                        message: "User not found!"
+                    })
                 }
             })
             .catch(error => {
-                console.log(error)
-            })
+                if (error) {
+                    console.log(error);
+                }
+            });
     }
     catch (err) {
         console.log(err);

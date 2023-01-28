@@ -13,6 +13,10 @@ const UserCartSchema = mongoose.Schema({
     quantity:{
         type:Number,
         required:true
+    },
+    currentSellerId:{
+        type:String,
+        ref:'Seller'
     }
 });
 

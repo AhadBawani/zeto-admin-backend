@@ -58,7 +58,7 @@ module.exports.ADD_REVIEW = (async (req, res) => {
                                                                     }
                                                                 })
                                                                 .catch(error => {
-                                                                    console.log(error);
+                                                                    res.status(400).send(error);
                                                                 });
                                                         }
                                                     })

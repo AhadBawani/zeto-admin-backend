@@ -21,3 +21,28 @@ module.exports.GET_ALL_PRODUCTS = (async (req, res) => {
     }
 })
 
+module.exports.GET_SELLER_PRODUCTS = (async (req, res) => {
+    ProductSchema.aggregate([
+        {
+            $lookup:{
+                from: 'SellerSchema',
+                localField:'sellerID',
+                foreignField: '_id',
+                as : 'seller'
+            }
+        },
+        {
+            $group:{
+                _id:'$sellerID',
+                count:{ $sum: 1 }          
+            }
+        }
+    ])
+    .exec()
+    .then(response => {
+        res.json(response);
+    })
+    .catch(error => {
+        console.log(error)
+    })
+})
