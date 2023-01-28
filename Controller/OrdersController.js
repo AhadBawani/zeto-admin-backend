@@ -86,18 +86,22 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                             try {
                                                 let orderResponse = await order.save();
                                                 if (orderResponse) {
-                                                    UserCartSchema.remove({ productId: product[i]?.productId })
+                                                    UserCartSchema.deleteOne({ productId: product[i]?.productId })
                                                         .exec()
                                                         .then(response => {
-                                                                                                                        
+
                                                         })
                                                         .catch(error => {
-                                                            console.log(error);
+                                                            res.status(400).send(error);
                                                         })
                                                 }
+                                                res.status(200).send({
+                                                    message: "Order Placed Successfully!",
+                                                    orderId: process.env.START_ORDER
+                                                })
                                             }
                                             catch (err) {
-                                                console.log(err)
+                                                res.status(400).send(err);
                                             }
                                         }
                                         else {
@@ -116,18 +120,18 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                             try {
                                                 let orderResponse = await order.save();
                                                 if (orderResponse) {
-                                                    UserCartSchema.remove({ productId: product[i]?.productId })
+                                                    UserCartSchema.deleteOne({ productId: product[i]?.productId })
                                                         .exec()
                                                         .then(response => {
-                                                            
+
                                                         })
                                                         .catch(error => {
-                                                            console.log(error);
+                                                            res.status(400).send(error);
                                                         })
                                                 }
                                             }
                                             catch (err) {
-                                                console.log(err)
+                                                res.status(400).send(err);
                                             }
                                         }
                                     })
@@ -145,14 +149,6 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                             console.log(error)
                         })
                 }
-                Order.findOne().sort({ _id: -1 }).limit(1).exec((err, response) => {
-                    if (response) {
-                        res.status(200).send({
-                            message: "Order Placed Successfully!",
-                            orderId: response.orderId
-                        })
-                    }
-                })
             }
             else {
                 res.status(404).send({
@@ -160,6 +156,14 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                 })
             }
         })
+    Order.findOne().sort({ _id: -1 }).limit(1).exec((err, response) => {
+        if (response) {
+            res.status(200).send({
+                message: "Order Placed Successfully!",
+                orderId: response.orderId + 1
+            })
+        }
+    })
 })
 
 module.exports.ORDER_DELIVERED = (async (req, res) => {
@@ -167,11 +171,14 @@ module.exports.ORDER_DELIVERED = (async (req, res) => {
         .exec()
         .then(response => {
             if (response.length > 0) {
-                Order.updateMany({ orderId: req.params.orderId }, { delivered: true })
+                Order.updateMany({ orderId: req.params.orderId }, { orderDelivered: true })
                     .exec()
                     .then(response => {
-                        console.log(response);
-                        res.send("console")
+                        if(response.modifiedCount > 0){
+                            res.status(200).send({
+                                message : "Updated successfully!"
+                            })
+                        }
                     })
                     .catch();
             }

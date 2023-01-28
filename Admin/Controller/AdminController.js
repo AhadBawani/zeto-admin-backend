@@ -164,14 +164,14 @@ module.exports.DELETE_USER = (async (req, res) => {
 
 module.exports.DELETE_PRODUCT = (async (req, res) => {
     try {
-        Product.remove({ _id: req.params.productId })
+        Product.deleteOne({ _id: req.params.productId })
             .exec()
             .then(response => {
                 if (response?.deletedCount > 0) {
                     res.status(200).send({
                         message: "Product deleted successfully"
                     })
-                    UserCart.remove({ productId: req.params.productId });
+                    UserCart.deleteMany({ productId: req.params.productId });
                 }
                 else {
                     res.status(404).send({

@@ -40,7 +40,11 @@ const OrderSchema = mongoose.Schema({
     },
     orderDelivered:{
         type:Boolean,
-        required:true
+        default:false
+    },
+    orderReview:{
+        type:Boolean,
+        default:false        
     }
 })
 

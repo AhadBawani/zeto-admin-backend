@@ -80,7 +80,7 @@ module.exports.ADD_USER_CART = (async (req, res) => {
                                                 }
                                             }
                                             else {
-                                                UserCartSchema.remove({ userId: userId, currentSellerId: userCartResponse.currentSellerId })
+                                                UserCartSchema.deleteMany({ userId: userId, currentSellerId: userCartResponse.currentSellerId })
                                                     .exec()
                                                     .then(response => {
                                                         if (response.deletedCount > 0) {
@@ -243,7 +243,7 @@ module.exports.REMOVE_CART_QUANTITY = (async (req, res) => {
 
 module.exports.REMOVE_USER_CART = (async (req, res) => {
     try {
-        UserCartSchema.findById(req.params.cartId).remove()
+        UserCartSchema.findByIdAndDelete(req.params.cartId)
             .exec()
             .then(doc => {
                 if (doc.deletedCount > 0) {

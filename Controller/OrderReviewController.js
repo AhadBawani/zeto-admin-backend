@@ -1,5 +1,7 @@
 const OrderReview = require('../Schemas/OrderReviewSchema');
 const OrderSchema = require('../Schemas/OrderSchema');
+const ProductSchema = require('../Schemas/ProductSchema');
+const SellerReviewSchema = require('../Schemas/SellerReviewSchema');
 const UserSchema = require('../Schemas/UserSchema');
 
 
@@ -32,16 +34,22 @@ module.exports.ADD_REVIEW = (async (req, res) => {
                         }).save();
                         orderReview
                             .then(async response => {
-                                if (response) {
+                                if (response) {                                
                                     await OrderSchema.findOne({ orderId: orderId })
                                         .exec()
                                         .then(async response => {
                                             if (response) {
+                                                await OrderSchema.updateMany({ orderId : orderId }, { orderReview:true })
+                                                .exec()
+                                                .then(response => {                                                    
+                                                })
+                                                .catch(error => {
+                                                    res.status(400).send(error);
+                                                })
                                                 await ProductSchema.findById(response.productId)
                                                     .exec()
                                                     .then(response => {
-                                                        if (response) {
-                                                            console.log(response);
+                                                        if (response) {                                                            
                                                             const sellerReview = new SellerReviewSchema({
                                                                 sellerId: response.sellerID,
                                                                 userId: userId,
@@ -72,9 +80,8 @@ module.exports.ADD_REVIEW = (async (req, res) => {
                                         })
                                 }
                             })
-                            .catch(error => {
-                                console.log(error);
-                                res.status(400).send({
+                            .catch(error => {                                
+                                res.status(200).send({
                                     message : "Order review already have been submitted"
                                 });
                             });
