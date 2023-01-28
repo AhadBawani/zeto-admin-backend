@@ -4,7 +4,7 @@ const Seller = require('../Schemas/SellerSchema');
 
 module.exports.GET_ALL_SELLER = (async (req, res) => {
     try {
-        let seller = await Seller.find().select('_id sellerName sellerImage date');
+        let seller = await Seller.find().select('_id sellerName sellerImage date category');
         res.status(200).json(seller);        
         // SellerSchema.aggregate([
         //     {
