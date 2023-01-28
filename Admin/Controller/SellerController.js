@@ -29,11 +29,13 @@ module.exports.GET_ALL_SELLER = (async (req, res) => {
 })
 
 module.exports.ADD_SELLER = (async (req, res) => {
+    const { sellerName, date, category } = req.body;
     try {
         const seller = new Seller({
-            sellerName: req.body.sellerName,
+            sellerName: sellerName,
             sellerImage: req.file.filename,
-            date: req.body.date
+            date: date,
+            category:category
         }).save();
 
         seller
@@ -42,10 +44,11 @@ module.exports.ADD_SELLER = (async (req, res) => {
                     res.status(201).json({
                         message: "Seller Created Successfully!",
                         seller: {
-                            _id: seller._id,
-                            sellerName: seller.sellerName,
-                            sellerImage: seller.sellerImage,
-                            date: seller.date
+                            _id: response._id,
+                            sellerName: response.sellerName,
+                            sellerImage: response.sellerImage,
+                            date: response.date,
+                            category:response.category
                         }
                     })
                 }
