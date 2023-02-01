@@ -1,0 +1,26 @@
+const express = require('express');
+const router = express.Router();
+const AdminController = require('../Controller/AdminController');
+const Orders = require('../../Schemas/OrderSchema');
+const moment = require('moment');
+const multer = require('multer');
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, "./Images");
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname);
+    }
+});
+const upload = multer({ storage: storage });
+
+router.get('/', AdminController.GET_ALL_ORDERS);
+router.post('/OrderDelivered/:orderId', AdminController.DELIVERED_ORDER);
+router.post('/', upload.single('productImage'), AdminController.ADD_PRODUCT);
+router.patch('/DisabledProduct/:productId/:result', AdminController.EDIT_DISABLED_PRODUCT);
+router.delete('/:productId', AdminController.DELETE_PRODUCT);
+router.delete('/deleteUser/:id', AdminController.DELETE_USER);
+router.put('/EditProduct/:productId', AdminController.EDIT_PRODUCT);
+
+
+module.exports = router;
