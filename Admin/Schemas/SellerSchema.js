@@ -17,6 +17,10 @@ const SellerSchema = new mongoose.Schema({
     category:{
         type:String,
         required:true
+    },
+    disabled:{
+        type:Boolean,
+        default:false
     }
 })
 

@@ -15,5 +15,6 @@ const upload = multer({ storage: storage });
 
 router.get('/', SellerController.GET_ALL_SELLER);
 router.post('/', upload.single('sellerImage'), SellerController.ADD_SELLER);
-
+router.delete('/:sellerId', SellerController.DELETE_SELLER);
+router.patch('/:sellerId/:result', SellerController.DISABLED_SELLER);
 module.exports = router;
