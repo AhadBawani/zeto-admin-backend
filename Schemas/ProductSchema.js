@@ -18,13 +18,15 @@ const ProductSchema = mongoose.Schema({
         required:true,
         ref:'Seller'
     },
-    category:{
+    subCategoryId:{
         type:String,
-        required:true
+        required:true,
+        ref:'SubCategory'
     },
-    mainCategory:{
+    categoryId:{
         type:String,
-        required:true
+        required:true,
+        ref:'Category'
     },
     description:{
         type:String,

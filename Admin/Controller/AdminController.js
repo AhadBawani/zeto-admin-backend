@@ -65,18 +65,19 @@ module.exports.EDIT_PRODUCT = (async (req, res) => {
 })
 
 module.exports.ADD_PRODUCT = ((req, res) => {
+    const { productName, price, sellerID, categoryId, subCategoryId, description, mrp, discount, disabled } = req.body;
     try {
         const product = new Product({
-            productName: req.body.productName,
+            productName: productName,
             productImage: req.file.filename,
-            price: req.body.price,
-            sellerID: req.body.sellerID,
-            category: req.body.category,
-            mainCategory: req.body.mainCategory,
-            description: req.body.description,
-            mrp: req.body.mrp,
-            discount: req.body.discount,
-            disabled: req.body.disabled
+            price: price,
+            sellerID: sellerID,
+            categoryId: categoryId,
+            subCategoryId: subCategoryId,
+            description: description,
+            mrp: mrp,
+            discount: discount,
+            disabled: disabled
         }).save();
 
         product
@@ -85,17 +86,17 @@ module.exports.ADD_PRODUCT = ((req, res) => {
                     res.status(201).json({
                         message: "Product Created Successfully!",
                         product: {
-                            _id: product._id,
-                            productName: product.productName,
-                            productImage: product.productImage,
-                            price: product.price,
-                            sellerName: product.sellerName,
-                            category: product.category,
-                            mainCategory: product.mainCategory,
-                            description: product.description,
-                            mrp: product.mrp,
-                            discount: product.discount,
-                            disabled: product.disabled
+                            _id: response._id,
+                            productName: response.productName,
+                            productImage: response.productImage,
+                            price: response.price,
+                            sellerName: response.sellerName,
+                            categoryId: response.categoryId,
+                            subCategoryId: response.subCategoryId,
+                            description: response.description,
+                            mrp: response.mrp,
+                            discount: response.discount,
+                            disabled: response.disabled
                         }
                     })
                 }
