@@ -35,13 +35,15 @@ router.post('/', (async (req, res) => {
 
         contact
             .then(response => {
-                if(repsonse){
+                if(response){
                     res.status(200).send({
                         message : "Contact Added Successfully!"
                     })
                 }
             })
-            .catch();
+            .catch(error => {
+                res.status(400).send(error);
+            });
     }
     catch (error) {
         console.log(error);
