@@ -5,7 +5,9 @@ const SellerSchema = require('../Admin/Schemas/SellerSchema');
 module.exports.GET_ALL_PRODUCTS = (async (req, res) => {
     try {
         await Product.find()
-            .select('_id productName productImage sellerName price category description mrp discount disabled mainCategory')
+            .select('_id productName productImage sellerID price categoryId description mrp discount disabled subCategoryId')
+            .populate('categoryId', 'category')
+            .populate('subCategoryId', 'subCategory')
             .exec()
             .then(response => {
                 if (response) {
