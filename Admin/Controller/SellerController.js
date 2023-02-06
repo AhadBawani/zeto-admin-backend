@@ -10,7 +10,7 @@ module.exports.GET_ALL_SELLER = (async (req, res) => {
 
         for (let i = 0; i < seller.length; i++) {
             const sellerReview = await SellerReviewSchema.find({ sellerId: seller[i]?._id }).populate('userId', 'email username phoneNumber');
-            const sellerProduct = await (await ProductSchema.find({ sellerID: seller[i]?._id })).length;
+            const sellerProduct = await (await ProductSchema.find({ sellerID: seller[i]?._id }));
             if (sellerReview.length > 0) {
                 let total = 0;
                 sellerReview.map((item) => {
@@ -23,7 +23,7 @@ module.exports.GET_ALL_SELLER = (async (req, res) => {
                 seller: seller[i],
                 review: sellerReview,
                 averageRating: sellerReview.length > 0 ? average : 0,
-                productCount: sellerProduct
+                product: sellerProduct
             }
             arr.push(obj);
         }
