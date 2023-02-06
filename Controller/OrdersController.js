@@ -81,7 +81,7 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                                 paymentType: req.body.paymentType,
                                                 paymentId: req.body.paymentId,
                                                 orderDelivered: req.body.orderDelivered,
-                                                date: req.body.date
+                                                date: req.body.date,                                                
                                             })
                                             try {
                                                 let orderResponse = await order.save();
@@ -104,7 +104,7 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                                 res.status(400).send(err);
                                             }
                                         }
-                                        else {
+                                        else {                                            
                                             var order = new Order({
                                                 orderId: response[response.length - 1]?.orderId + 1,
                                                 userId: req.body.userId,
@@ -174,9 +174,9 @@ module.exports.ORDER_DELIVERED = (async (req, res) => {
                 Order.updateMany({ orderId: req.params.orderId }, { orderDelivered: true })
                     .exec()
                     .then(response => {
-                        if(response.modifiedCount > 0){
+                        if (response.modifiedCount > 0) {
                             res.status(200).send({
-                                message : "Updated successfully!"
+                                message: "Updated successfully!"
                             })
                         }
                     })
@@ -188,5 +188,8 @@ module.exports.ORDER_DELIVERED = (async (req, res) => {
                 })
             }
         })
-        .catch();
+        .catch(error => {
+            console.log(error);
+        });
 })
+
