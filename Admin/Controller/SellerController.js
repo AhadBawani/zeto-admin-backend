@@ -10,10 +10,7 @@ module.exports.GET_ALL_SELLER = (async (req, res) => {
 
         for (let i = 0; i < seller.length; i++) {
             const sellerReview = await SellerReviewSchema.find({ sellerId: seller[i]?._id }).populate('userId', 'email username phoneNumber');
-            const sellerProduct = await ProductSchema.find({ sellerID: seller[i]?._id })
-                .select('_id productName productImage mrp price discount disabled sellerID subCategoryId categoryId description')
-                .populate('subCategoryId', 'subCategory')
-                .populate('categoryId', 'category');
+            const sellerProduct = await (await ProductSchema.find({ sellerID: seller[i]?._id }));
             if (sellerReview.length > 0) {
                 let total = 0;
                 sellerReview.map((item) => {

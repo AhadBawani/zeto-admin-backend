@@ -3,7 +3,7 @@ const Product = require('../../Schemas/ProductSchema');
 
 module.exports.GET_ALL_ORDERS = (async (req, res) => {
     try {
-        await Orders.find()
+        await Orders.find({ deleteOrder: false })
             .populate('productId')
             .populate('userId')
             .exec()

@@ -36,25 +36,34 @@ module.exports.GET_USER_ORDER = (async (req, res) => {
 
 
 module.exports.DELETE_ORDER = (async (req, res) => {
-    Order.deleteOne({ _id: req.params.orderId })
+    const orderId = req.params.orderId;
+
+    await Order.find({ orderId: orderId })
         .exec()
         .then(response => {
-            if (response.deletedCount > 0) {
-                res.status(200).send({
-                    message: "Deleted Successfully!"
-                })
+            if (response) {
+                Order.updateMany({ orderId: orderId }, { deleteOrder: true }, { new: true })
+                    .exec()
+                    .then(response => {
+                        if(response.modifiedCount > 0){
+                            res.status(200).send({
+                                message : "Order Deleted successfully!"
+                            })
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error);
+                    })
             }
             else {
                 res.status(404).send({
-                    message: "Order Not Found!"
+                    message: "Order not found!"
                 })
             }
         })
-        .catch(err => {
-            res.send({
-                message: err.message
-            })
-        });
+        .catch(error => {
+            console.log(error);
+        })
 })
 
 module.exports.PLACE_ORDER = (async (req, res) => {
@@ -81,7 +90,7 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                                 paymentType: req.body.paymentType,
                                                 paymentId: req.body.paymentId,
                                                 orderDelivered: req.body.orderDelivered,
-                                                date: req.body.date,                                                
+                                                date: req.body.date,
                                             })
                                             try {
                                                 let orderResponse = await order.save();
@@ -104,7 +113,7 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                                 res.status(400).send(err);
                                             }
                                         }
-                                        else {                                            
+                                        else {
                                             var order = new Order({
                                                 orderId: response[response.length - 1]?.orderId + 1,
                                                 userId: req.body.userId,
@@ -167,7 +176,7 @@ module.exports.PLACE_ORDER = (async (req, res) => {
 })
 
 module.exports.ORDER_DELIVERED = (async (req, res) => {
-    Order.find({ orderId: req.params.orderId })
+    Order.find({ orderId: req.params.orderId }, { deleteOrder:false })
         .exec()
         .then(response => {
             if (response.length > 0) {

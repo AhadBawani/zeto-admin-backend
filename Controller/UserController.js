@@ -82,7 +82,7 @@ module.exports.SIGNUP_USER = (async (req, res) => {
                     email: email,
                     phoneNumber: phoneNumber,
                     password: password,
-                    type: "User"
+                    type: "Customer"
                 })
                 try {
                     await user.save();
