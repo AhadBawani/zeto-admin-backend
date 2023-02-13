@@ -1,3 +1,4 @@
+const CategorySchema = require('../../Schemas/CategorySchema');
 const utils = require('../AdminUtils/Common/CommonUtils');
 
 module.exports.GET_ALL_CATEGORY = (async (req, res) => {
@@ -50,7 +51,7 @@ module.exports.ADD_CATEGORY = (async (req, res) => {
                         });
                 }
             })
-            .catch(error => {
+            .catch(error => {                
                 res.status(403).send({
                     message: "Permission Denied!"
                 })
