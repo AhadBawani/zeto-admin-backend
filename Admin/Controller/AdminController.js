@@ -46,8 +46,7 @@ module.exports.EDIT_PRODUCT = (async (req, res) => {
                         .then(async response => {
                             if (response) {
                                 let update = {
-                                    productName: productName,
-                                    productImage: req.file.filename,
+                                    productName: productName,                                    
                                     price: price,
                                     sellerID: sellerID,
                                     discount: discount,
