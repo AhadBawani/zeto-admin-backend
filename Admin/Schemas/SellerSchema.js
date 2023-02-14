@@ -14,8 +14,9 @@ const SellerSchema = new mongoose.Schema({
         type:String,
         required:true
     },
-    category:{
+    categoryId:{
         type:String,
+        ref:'Category',
         required:true
     },
     disabled:{

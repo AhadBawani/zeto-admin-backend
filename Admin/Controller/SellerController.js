@@ -3,6 +3,7 @@ const SellerSchema = require('../Schemas/SellerSchema');
 const ProductSchema = require('../../Schemas/ProductSchema');
 const Seller = require('../Schemas/SellerSchema');
 const utils = require('../AdminUtils/Common/CommonUtils');
+const CategorySchema = require('../../Schemas/CategorySchema');
 
 module.exports.GET_ALL_SELLER = (async (req, res) => {
     try {
@@ -36,37 +37,51 @@ module.exports.GET_ALL_SELLER = (async (req, res) => {
 })
 
 module.exports.ADD_SELLER = (async (req, res) => {
-    const { sellerName, date, category, userId } = req.body;
+    const { sellerName, date, categoryId, userId } = req.body;
     try {
         utils.VERIFY_USER(userId)
             .then(response => {
                 if (response) {
-                    const seller = new Seller({
-                        sellerName: sellerName,
-                        sellerImage: req.file.filename,
-                        date: date,
-                        category: category
-                    }).save();
-
-                    seller
+                    CategorySchema.findById(categoryId)
+                        .exec()
                         .then(response => {
                             if (response) {
-                                res.status(201).json({
-                                    message: "Seller Created Successfully!",
-                                    seller: {
-                                        _id: response._id,
-                                        sellerName: response.sellerName,
-                                        sellerImage: response.sellerImage,
-                                        date: response.date,
-                                        category: response.category,
-                                        disabled: response.disabled
-                                    }
+                                const seller = new Seller({
+                                    sellerName: sellerName,
+                                    sellerImage: req.file.filename,
+                                    date: date,
+                                    categoryId: categoryId
+                                }).save();
+
+                                seller
+                                    .then(response => {
+                                        if (response) {
+                                            res.status(201).json({
+                                                message: "Seller Created Successfully!",
+                                                seller: {
+                                                    _id: response._id,
+                                                    sellerName: response.sellerName,
+                                                    sellerImage: response.sellerImage,
+                                                    date: response.date,
+                                                    categoryId: response.categoryId,
+                                                    disabled: response.disabled
+                                                }
+                                            })
+                                        }
+                                    })
+                                    .catch(error => {
+                                        res.status(400).send(error);
+                                    });
+                            }
+                            else {
+                                res.status(404).send({
+                                    message: "Category not found!"
                                 })
                             }
                         })
                         .catch(error => {
-                            res.status(400).send(error);
-                        });
+                            console.log(error);
+                        })
                 }
             })
             .catch(error => {
