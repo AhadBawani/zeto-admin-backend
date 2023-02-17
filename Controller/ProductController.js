@@ -8,6 +8,7 @@ module.exports.GET_ALL_PRODUCTS = (async (req, res) => {
             .select('_id productName productImage sellerID price categoryId description mrp discount disabled subCategoryId')
             .populate('categoryId', 'category')
             .populate('subCategoryId', 'subCategory')
+            .populate('sellerID', 'sellerName sellerImage')
             .exec()
             .then(response => {
                 if (response) {

@@ -7,6 +7,7 @@ module.exports.GET_SUB_CATEGORY = (async (req, res) => {
     try {
         await SubCategorySchema.find()
             .select('_id categoryId subCategory date sellerId')
+            .populate('categoryId', 'category')
             .exec()
             .then(response => {
                 res.status(200).json(response);
