@@ -164,7 +164,12 @@ module.exports.DISABLED_SELLER = (async (req, res) => {
 module.exports.EDIT_SELLER = (async (req, res) => {
     const sellerId = req.params.sellerId;
     const { sellerName, categoryId, userId } = req.body;
-
+    const updateSeller = { 
+        sellerName : sellerName, 
+        categoryId : categoryId, 
+        userId :userId,
+        sellerImage:req.file?.filename
+    }
     try {
         utils.VERIFY_USER(userId)
             .then(async response => {
@@ -172,7 +177,7 @@ module.exports.EDIT_SELLER = (async (req, res) => {
                     .exec()
                     .then(response => {
                         if (response) {
-                            SellerSchema.findByIdAndUpdate(sellerId, { sellerName: sellerName, categoryId: categoryId, sellerImage: req.file.filename }, { new: true })
+                            SellerSchema.findByIdAndUpdate(sellerId, updateSeller, { new: true })
                                 .exec()
                                 .then(response => {
                                     if (response) {
