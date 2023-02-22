@@ -1,0 +1,60 @@
+const mongoose = require('mongoose');
+
+const OrderSchema = mongoose.Schema({
+    orderId:{
+        type:Number,        
+        required:true
+    },
+    userId:{
+        type:String,
+        ref:'User',
+        required:true
+    },
+    productId:{
+        type:String,
+        ref:'Product',
+        required:true
+    },    
+    quantity:{
+        type:Number,
+        required:true
+    },
+    date:{
+        type:String,
+        required:true
+    },
+    block:{
+        type:String,
+        required:true
+    },
+    room:{
+        type:Number,
+        required:true
+    },
+    deliveryRate:{
+        type:Number,
+        required:true
+    },
+    total:{
+        type:Number,
+        required:true
+    },
+    paymentType:{
+        type:String,
+        required:true
+    },    
+    orderDelivered:{
+        type:Boolean,
+        default:false
+    },
+    orderReview:{
+        type:Boolean,
+        default:false
+    },
+    deleteOrder:{
+        type:Boolean,
+        default:false
+    }
+})
+
+module.exports = mongoose.model('Order', OrderSchema);
