@@ -25,8 +25,9 @@ module.exports.GET_USER_ORDER = (async (req, res) => {
                                 const orderQauntity = [];
                                 const order = response.filter((item) => item?.orderId === response[i].orderId);
                                 order.map((item) => {
-                                    orderProduct.push({ 
-                                        productName : item.productId.productName, 
+                                    orderProduct.push({
+                                        productId:item.productId._id,
+                                        productName : item.productId.productName,
                                         productImage:item.productId.productImage,
                                         price: item.productId.price,
                                         mrp: item.productId.mrp,

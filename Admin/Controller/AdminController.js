@@ -12,10 +12,10 @@ module.exports.GET_ALL_ORDERS = (async (req, res) => {
             .then(async response => {
                 if (response) {
                     await Orders.find({ deleteOrder: false })
-                        .populate('productId')
+                        .populate('productId')                        
                         .populate('userId')
                         .exec()
-                        .then(response => {
+                        .then(response => {                            
                             if (response) {
                                 for (let i = 0; i < response.length; i++) {
                                     const orderProduct = [];
@@ -38,9 +38,9 @@ module.exports.GET_ALL_ORDERS = (async (req, res) => {
                                     const obj = {
                                         orderId: response[i].orderId,
                                         user: {
-                                            username: response[0].userId.username,
-                                            phoneNumber: response[0].userId.phoneNumber,
-                                            email: response[0].userId.email
+                                            username: response[i].userId.username,
+                                            phoneNumber: response[i].userId.phoneNumber,
+                                            email: response[i].userId.email
                                         },
                                         product: orderProduct,
                                         price: orderPrice,
@@ -48,6 +48,8 @@ module.exports.GET_ALL_ORDERS = (async (req, res) => {
                                         block: response[i].block,
                                         room: response[i].room,
                                         date: response[i].date,
+                                        deliveryRate:response[i].deliveryRate,
+                                        total: (orderPrice.map((v, i) => v * orderQauntity[i]).reduce((x, y) => x + y, 0) + response[i].deliveryRate),
                                         orderDelivered: response[i].orderDelivered,
                                         orderReview: response[i].orderReview,
                                         deleteOrder: response[i].deleteOrder
