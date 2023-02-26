@@ -1,8 +1,7 @@
 const DelieveryRate = require('../Admin/Schemas/DelieveryRate');
-const OrderSchema = require('../Schemas/OrderSchema');
 const Order = require('../Schemas/OrderSchema');
 const ProductSchema = require('../Schemas/ProductSchema');
-const Product = require('../Schemas/ProductSchema');
+const nodemailer = require('nodemailer');
 const UserCartSchema = require('../Schemas/UserCartSchema');
 const User = require('../Schemas/UserSchema');
 require('dotenv/config');
@@ -20,15 +19,15 @@ module.exports.GET_USER_ORDER = (async (req, res) => {
                     .then(response => {
                         if (response.length) {
                             for (let i = 0; i < response.length; i++) {
-                                const orderProduct = [];                                
+                                const orderProduct = [];
                                 const orderPrice = [];
                                 const orderQauntity = [];
                                 const order = response.filter((item) => item?.orderId === response[i].orderId);
                                 order.map((item) => {
                                     orderProduct.push({
-                                        productId:item.productId._id,
-                                        productName : item.productId.productName,
-                                        productImage:item.productId.productImage,
+                                        productId: item.productId._id,
+                                        productName: item.productId.productName,
+                                        productImage: item.productId.productImage,
                                         price: item.productId.price,
                                         mrp: item.productId.mrp,
                                         discount: item.productId.discount,
@@ -112,13 +111,31 @@ module.exports.DELETE_ORDER = (async (req, res) => {
 })
 
 module.exports.PLACE_ORDER = (async (req, res) => {
-    const { userId, product, block, room, paymentType, orderDelivered, date } = req.body;
-
+    const { userId, product, block, room, paymentType, orderDelivered } = req.body;
+    var date = req.body.date;
+    const today = new Date();
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.PASSWORD
+        }
+    });
+    const productArr = [];
+    const currentHour = today.getHours();    
+    if((currentHour > process.env.LAST_ORDER_TIME) | (currentHour == process.env.LAST_ORDER_TIME && today.getMinutes() > 1)){
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+        date = tomorrow.getDate() + "/" + ((tomorrow.getMonth() + 1) > 10 ? tomorrow.getMonth() + 1 : "0" + (tomorrow.getMonth() + 1)) + "/" + tomorrow.getFullYear();
+    }
+    else{
+        date = date;
+    }    
     try {
         await User.findById(userId)
             .exec()
-            .then(response => {
-                if (response) {
+            .then(userResponse => {
+                if (userResponse) {
                     Order.findOne({}, {}, { sort: { '_id': -1 } }).select('orderId')
                         .exec()
                         .then(response => {
@@ -128,6 +145,14 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                         .exec()
                                         .then(productResponse => {
                                             if (productResponse) {
+                                                const productObject = {
+                                                    productName: productResponse.productName,
+                                                    price: productResponse.price,
+                                                    quantity: product[i].quantity
+                                                }
+
+                                                productArr.push(productObject);
+
                                                 DelieveryRate.findOne().sort({ _id: -1 })
                                                     .exec()
                                                     .then(deliveryResponse => {
@@ -160,7 +185,33 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                         .catch(error => {
                                             res.status(400).send(error);
                                         })
-                                }
+                                }                                
+                                const mailOptions = {
+                                    from: 'ahadbawani123@gmail.com',
+                                    to: userResponse.email,
+                                    subject: 'Order Confirmation',
+                                    text: `Dear customer,
+                                    Thank you for your order. Your order ID is ${(response.orderId + 1)}
+                                    your order will be delivered on ${date} between 7pm to 9pm
+
+                                    Thank you for shopping with us
+                                    
+                                    
+                                    Best regards,
+                                    Zetomart`
+                                };
+                                transporter.sendMail(mailOptions, (error, info) => {
+                                    if (error) {
+                                        console.log(error);
+                                    }
+                                    else {
+                                        console.log("Email sended successfully")    
+                                    }
+                                })
+                                res.status(200).send({
+                                    orderId: (response.orderId + 1),
+                                    message: "Order placed successfully!"
+                                })
                             }
                             else {
                                 for (let i = 0; i < product.length; i++) {
@@ -200,11 +251,34 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                         .catch(error => {
                                             res.status(400).send(error);
                                         })
-                                        
-                                        res.status(200).send({
-                                            orderId:process.env.START_ORDER,
-                                            message: "Order placed successfully!"
+
+                                        const mailOptions = {
+                                            from: 'ahadbawani123@gmail.com',
+                                            to: userResponse.email,
+                                            subject: 'Order Confirmation',
+                                            text: `Dear customer,
+                                            Thank you for your order. Your order ID is ${(response.orderId + 1)}
+                                            your order will be delivered on ${date} between 7pm to 9pm
+        
+                                            Thank you for shopping with us
+                                            
+                                            
+                                            Best regards,
+                                            Zetomart`
+                                        };
+                                        transporter.sendMail(mailOptions, (error, info) => {
+                                            if (error) {
+                                                console.log(error);
+                                            }
+                                            else {
+                                                console.log("Email sended successfully")    
+                                            }
                                         })
+
+                                    res.status(200).send({
+                                        orderId: process.env.START_ORDER,
+                                        message: "Order placed successfully!"
+                                    })
                                 }
                             }
                         })
@@ -220,16 +294,6 @@ module.exports.PLACE_ORDER = (async (req, res) => {
             })
             .catch(error => {
                 console.log(error);
-            })
-        await OrderSchema.findOne({ userId : userId }).sort({ _id: -1 })
-            .exec()
-            .then(response => {                
-                if (response) {                    
-                    res.status(200).send({
-                        orderId: (response.orderId + 1),
-                        message: "Order placed successfully!"
-                    })
-                }
             })
     }
     catch (error) {
