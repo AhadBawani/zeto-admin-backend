@@ -29,76 +29,64 @@ module.exports.ADD_SUB_CATEGORY = (req, res) => {
                 if (response) {
                     CategorySchema.findById(categoryId)
                         .exec()
-                        .then(response => {
-                            SellerSchema.findById(sellerId)
+                        .then(categoryResponse => {                            
+                            if(categoryResponse){
+                                SellerSchema.findById(sellerId)
                                 .exec()
-                                .then(response => {
-                                    if (response) {
-                                        CategorySchema.findById(categoryId)
-                                            .exec()
-                                            .then(response => {
-                                                if (response) {
-                                                    SubCategorySchema.find({ subCategory: subCategory })
-                                                        .exec()
-                                                        .then(response => {
-                                                            if (!response) {
-                                                                if (response) {
-                                                                    const SubCategory = new SubCategorySchema({
-                                                                        categoryId: categoryId,
-                                                                        subCategory: subCategory,
-                                                                        sellerId: sellerId
-                                                                    }).save();
+                                .then(sellerResponse => {
+                                    if(sellerResponse){
+                                        SubCategorySchema.findOne({ subCategory : subCategory })
+                                        .exec()
+                                        .then(subCategoryResponse => {
+                                            if(!subCategoryResponse){
+                                                const SubCategory = new SubCategorySchema({
+                                                    categoryId: categoryId,
+                                                    subCategory: subCategory,
+                                                    sellerId: sellerId
+                                                }).save();
 
-                                                                    SubCategory
-                                                                        .then(response => {
-                                                                            if (response) {
-                                                                                res.status(200).send({
-                                                                                    message: "Sub Category Added Successfully!",
-                                                                                    SubCategory: {
-                                                                                        _id: response._id,
-                                                                                        categoryId: response.categoryId,
-                                                                                        subCategory: response.subCategory
-                                                                                    }
-                                                                                })
-                                                                            }
-                                                                        })
-                                                                        .catch(error => {
-                                                                            res.status(400).send(error);
-                                                                        });
-                                                                }
-                                                                else {
-                                                                    res.status(404).send({
-                                                                        message: "Category Not Found!"
-                                                                    })
-                                                                }
-                                                            }
-                                                            else {
-                                                                res.status(400).send({
-                                                                    message: "Sub Category already exists!"
-                                                                })
+                                                SubCategory
+                                                .then(response => {
+                                                    if (response) {
+                                                        res.status(200).send({
+                                                            message: "Sub Category Added Successfully!",
+                                                            SubCategory: {
+                                                                _id: response._id,
+                                                                categoryId: response.categoryId,
+                                                                subCategory: response.subCategory
                                                             }
                                                         })
-                                                        .catch(error => {
-                                                            console.log(error);
-                                                        })
-                                                }
-                                                else {
-                                                    res.status(400).send({
-                                                        message: "Category not found!"
-                                                    })
-                                                }
-                                            })
-                                            .catch(error => {
-                                                console.log(error);
-                                            })
+                                                    }
+                                                })
+                                                .catch(error => {
+                                                    res.status(400).send(error);
+                                                });
+                                            }
+                                            else{
+                                                res.status(400).send({
+                                                    message : "Sub Category already exists!"
+                                                })
+                                            }
+                                        })
+                                        .catch(error => {
+                                            console.log(error);
+                                        })
                                     }
-                                    else {
-                                        res.status(400).send({
-                                            message: "Seller not found!"
+                                    else{
+                                        res.status(404).send({
+                                            message : "Seller not found!"
                                         })
                                     }
                                 })
-                                .catch(error);
+                                .catch(error => {
+                                    console.log(error);
+                                })
+                            }
+                            else{
+                                res.status(404).send({
+                                    message : "Category not found!"
+                                })
+                            }
                         })
                         .catch(error => {
                             console.log(error);
