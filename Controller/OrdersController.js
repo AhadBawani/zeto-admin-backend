@@ -163,9 +163,9 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                                             date: date,
                                                         }).save();
 
-                                                        UserCartSchema.findOneAndRemove({ productId: product[i].productId })
-                                                        .exec()
-                                                        .then(response => console.log(response));
+                                                        // UserCartSchema.findOneAndRemove({ productId: product[i].productId })
+                                                        // .exec()
+                                                        // .then(response => console.log(response));
                                                     })
                                                     .catch(error => {
                                                         res.status(400).send(error);
@@ -231,9 +231,9 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                                             date: date,
                                                         }).save();
 
-                                                        UserCartSchema.findOneAndRemove({ productId: product[i].productId })
-                                                        .exec()
-                                                        .then(response => console.log(response));
+                                                        // UserCartSchema.findOneAndRemove({ productId: product[i].productId })
+                                                        // .exec()
+                                                        // .then(response => console.log(response));
                                                     })
                                                     .catch(error => {
                                                         res.status(400).send(error);
@@ -282,6 +282,10 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                         .catch(error => {
                             console.log(error);
                         })
+
+                        UserCartSchema.deleteMany({ userId : userId })
+                        .exec()
+                        .then(response => console.log(response));
                 }
                 else {
                     res.status(400).send({
