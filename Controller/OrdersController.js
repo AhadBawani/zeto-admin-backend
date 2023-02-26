@@ -145,13 +145,6 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                         .exec()
                                         .then(productResponse => {
                                             if (productResponse) {
-                                                const productObject = {
-                                                    productName: productResponse.productName,
-                                                    price: productResponse.price,
-                                                    quantity: product[i].quantity
-                                                }
-
-                                                productArr.push(productObject);
 
                                                 DelieveryRate.findOne().sort({ _id: -1 })
                                                     .exec()
@@ -170,7 +163,9 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                                             date: date,
                                                         }).save();
 
-                                                        UserCartSchema.deleteOne({ productId: product[i].productId });
+                                                        UserCartSchema.findOneAndRemove({ productId: product[i].productId })
+                                                        .exec()
+                                                        .then(response => console.log(response));
                                                     })
                                                     .catch(error => {
                                                         res.status(400).send(error);
@@ -205,7 +200,7 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                         console.log(error);
                                     }
                                     else {
-                                        console.log("Email sended successfully")    
+                                        console.log("Email sended successfully");
                                     }
                                 })
                                 res.status(200).send({
@@ -236,7 +231,9 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                                             date: date,
                                                         }).save();
 
-                                                        UserCartSchema.deleteOne({ productId: product[i].productId });
+                                                        UserCartSchema.findOneAndRemove({ productId: product[i].productId })
+                                                        .exec()
+                                                        .then(response => console.log(response));
                                                     })
                                                     .catch(error => {
                                                         res.status(400).send(error);
@@ -257,7 +254,7 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                             to: userResponse.email,
                                             subject: 'Order Confirmation',
                                             text: `Dear customer,
-                                            Thank you for your order. Your order ID is ${(response.orderId + 1)}
+                                            Thank you for your order. Your order ID is ${process.env.START_ORDER}
                                             your order will be delivered on ${date} between 7pm to 9pm
         
                                             Thank you for shopping with us
@@ -276,7 +273,7 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                         })
 
                                     res.status(200).send({
-                                        orderId: process.env.START_ORDER,
+                                        orderId: parseInt(process.env.START_ORDER),
                                         message: "Order placed successfully!"
                                     })
                                 }
