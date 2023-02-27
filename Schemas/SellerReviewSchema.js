@@ -22,6 +22,10 @@ const SellerReview = new mongoose.Schema({
     date:{
         type:Date,
         default:Date.now()
+    },
+    deleteReview:{
+        type:Boolean,
+        default:false
     }
 })
 
