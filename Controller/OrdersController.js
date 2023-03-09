@@ -111,18 +111,18 @@ module.exports.DELETE_ORDER = (async (req, res) => {
         })
 })
 
-module.exports.PLACE_ORDER = (async (req, res) => {
+module.exports.PLACE_ORDER = (async (req, res) => {    
     const { userId, product, block, room, paymentType, orderDelivered } = req.body;
     var date = req.body.date;
     const today = new Date();
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.EMAIL,
-            pass: process.env.PASSWORD
-        }
-    });
-    const productArr = [];
+    // const transporter = nodemailer.createTransport({
+    //     service: 'gmail',
+    //     auth: {
+    //         user: process.env.EMAIL,
+    //         pass: process.env.PASSWORD
+    //     }
+    // });
+    // const productArr = [];
     const currentHour = today.getHours();
     if ((currentHour > process.env.LAST_ORDER_TIME) | (currentHour == process.env.LAST_ORDER_TIME && today.getMinutes() > 1)) {
         const tomorrow = new Date(today);
@@ -182,28 +182,28 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                             res.status(400).send(error);
                                         })
                                 }
-                                const mailOptions = {
-                                    from: 'ahadbawani123@gmail.com',
-                                    to: userResponse.email,
-                                    subject: 'Order Confirmation',
-                                    text: `Dear customer,
-                                    Thank you for your order. Your order ID is ${(response.orderId + 1)}
-                                    your order will be delivered on ${date} between 7pm to 9pm
+                                // const mailOptions = {
+                                //     from: 'ahadbawani123@gmail.com',
+                                //     to: userResponse.email,
+                                //     subject: 'Order Confirmation',
+                                //     text: `Dear customer,
+                                //     Thank you for your order. Your order ID is ${(response.orderId + 1)}
+                                //     your order will be delivered on ${date} between 7pm to 9pm
 
-                                    Thank you for shopping with us
-                                    
-                                    
-                                    Best regards,
-                                    Zetomart`
-                                };
-                                transporter.sendMail(mailOptions, (error, info) => {
-                                    if (error) {
-                                        console.log(error);
-                                    }
-                                    else {
-                                        console.log("Email sended successfully");
-                                    }
-                                })
+                                //     Thank you for shopping with us
+
+
+                                //     Best regards,
+                                //     Zetomart`
+                                // };
+                                // transporter.sendMail(mailOptions, (error, info) => {
+                                //     if (error) {
+                                //         console.log(error);
+                                //     }
+                                //     else {
+                                //         console.log("Email sended successfully");
+                                //     }
+                                // })
                                 res.status(200).send({
                                     orderId: (response.orderId + 1),
                                     message: "Order placed successfully!"
@@ -250,28 +250,28 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                             res.status(400).send(error);
                                         })
 
-                                    const mailOptions = {
-                                        from: 'ahadbawani123@gmail.com',
-                                        to: userResponse.email,
-                                        subject: 'Order Confirmation',
-                                        text: `Dear customer,
-                                            Thank you for your order. Your order ID is ${process.env.START_ORDER}
-                                            your order will be delivered on ${date} between 7pm to 9pm
-        
-                                            Thank you for shopping with us
-                                            
-                                            
-                                            Best regards,
-                                            Zetomart`
-                                    };
-                                    transporter.sendMail(mailOptions, (error, info) => {
-                                        if (error) {
-                                            console.log(error);
-                                        }
-                                        else {
-                                            console.log("Email sended successfully")
-                                        }
-                                    })
+                                    // const mailOptions = {
+                                    //     from: 'ahadbawani123@gmail.com',
+                                    //     to: userResponse.email,
+                                    //     subject: 'Order Confirmation',
+                                    //     text: `Dear customer,
+                                    //         Thank you for your order. Your order ID is ${process.env.START_ORDER}
+                                    //         your order will be delivered on ${date} between 7pm to 9pm
+
+                                    //         Thank you for shopping with us
+
+
+                                    //         Best regards,
+                                    //         Zetomart`
+                                    // };
+                                    // transporter.sendMail(mailOptions, (error, info) => {
+                                    //     if (error) {
+                                    //         console.log(error);
+                                    //     }
+                                    //     else {
+                                    //         console.log("Email sended successfully")
+                                    //     }
+                                    // })
 
                                     res.status(200).send({
                                         orderId: parseInt(process.env.START_ORDER),
@@ -369,7 +369,7 @@ module.exports.GENERATE_ORDER_PDF = (async (req, res) => {
                         prepareHeader: () => doc.font('Helvetica-Bold'),
                         prepareRow: (row, i) => doc.font('Helvetica').fontSize(12)
                     });
-                    
+
                     doc.fontSize(15).text(`Total: ${total}`);
 
                     doc.end();
