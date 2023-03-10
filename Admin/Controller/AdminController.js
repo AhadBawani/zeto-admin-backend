@@ -5,6 +5,7 @@ const utils = require('../AdminUtils/Common/CommonUtils');
 
 module.exports.GET_ALL_ORDERS = (async (req, res) => {
     const { userId } = req.params;
+    const arr = [];
     try {
         utils.VERIFY_USER(userId)
             .then(async response => {
@@ -15,7 +16,48 @@ module.exports.GET_ALL_ORDERS = (async (req, res) => {
                         .exec()
                         .then(response => {
                             if (response) {
-                                res.status(200).json(response);
+                                for (let i = 0; i < response.length; i++) {
+                                    const orderProduct = [];
+                                    const orderPrice = [];
+                                    const orderQauntity = [];
+                                    const order = response.filter((item) => item?.orderId === response[i].orderId);
+                                    order.map((item) => {
+                                        orderProduct.push({
+                                            productName: item.productId.productName,
+                                            productImage: item.productId.productImage,
+                                            price: item.productId.price,
+                                            mrp: item.productId.mrp,
+                                            discount: item.productId.discount,
+                                            disabled: item.productId.disabled
+                                        });
+                                        orderQauntity.push(item.quantity);
+                                        orderPrice.push(item.productId.price);
+                                    })
+
+                                    const obj = {
+                                        orderId: response[i].orderId,
+                                        user: {
+                                            username: response[i].userId.username,
+                                            phoneNumber: response[i].userId.phoneNumber,
+                                            email: response[i].userId.email
+                                        },
+                                        product: orderProduct,
+                                        price: orderPrice,
+                                        quantity: orderQauntity,
+                                        block: response[i].block,
+                                        room: response[i].room,
+                                        date: response[i].date,
+                                        deliveryRate: response[i].deliveryRate,
+                                        total: (orderPrice.map((v, i) => v * orderQauntity[i]).reduce((x, y) => x + y, 0) + response[i].deliveryRate),
+                                        orderDelivered: response[i].orderDelivered,
+                                        orderReview: response[i].orderReview,
+                                        deleteOrder: response[i].deleteOrder
+                                    }
+
+                                    arr.push(obj);
+                                }
+                                const userOrders = [...new Map(arr.map(v => [v.orderId, v])).values()];
+                                res.status(200).send(userOrders);
                             }
                         })
                         .catch(error => {
@@ -47,7 +89,7 @@ module.exports.EDIT_PRODUCT = (async (req, res) => {
                             if (response) {
                                 let update = {
                                     productName: productName,
-                                    productImage:req.file?.filename,                                    
+                                    productImage: req.file?.filename,
                                     price: price,
                                     sellerID: sellerID,
                                     discount: discount,
