@@ -68,19 +68,11 @@ module.exports.DELETE_ORDER = (async (req, res) => {
 })
 
 module.exports.PLACE_ORDER = (async (req, res) => {
-    const { userId, product, block, room, paymentType, orderDelivered } = req.body;
-    let { date } = req.body;
+    const { userId, product, block, room, paymentType, orderDelivered, date } = req.body;
     const today = new Date();
-    var changeDate = null;
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
     const currentHour = today.getHours();
-    if ((currentHour > process.env.LAST_ORDER_TIME) | (currentHour == process.env.LAST_ORDER_TIME && today.getMinutes() > 1)) {
-        const tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate() + 1);
-        changeDate = tomorrow.getDate() + "/" + ((tomorrow.getMonth() + 1) > 10 ? tomorrow.getMonth() + 1 : "0" + (tomorrow.getMonth() + 1)) + "/" + tomorrow.getFullYear();
-    }
-    else {
-        changeDate = date;
-    }
     try {
         User.findById(userId)
             .then(async userResponse => {
@@ -109,7 +101,7 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                                                 room: room,
                                                                 paymentType: paymentType,
                                                                 orderDelivered: orderDelivered,
-                                                                date: changeDate,
+                                                                date: (currentHour > process.env.LAST_ORDER_TIME) | (currentHour == process.env.LAST_ORDER_TIME && today.getMinutes() > 1) ? tomorrow.getDate() + "/" + ((tomorrow.getMonth() + 1) > 10 ? tomorrow.getMonth() + 1 : "0" + (tomorrow.getMonth() + 1)) + "/" + tomorrow.getFullYear() : date
                                                             }).save();                                                            
                                                         }
                                                         else {
@@ -142,7 +134,7 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                                                 room: room,
                                                                 paymentType: paymentType,
                                                                 orderDelivered: orderDelivered,
-                                                                date: changeDate,
+                                                                date: (currentHour > process.env.LAST_ORDER_TIME) | (currentHour == process.env.LAST_ORDER_TIME && today.getMinutes() > 1) ? tomorrow.getDate() + "/" + ((tomorrow.getMonth() + 1) > 10 ? tomorrow.getMonth() + 1 : "0" + (tomorrow.getMonth() + 1)) + "/" + tomorrow.getFullYear() : date
                                                             }).save();
                                                         }
                                                         else {
