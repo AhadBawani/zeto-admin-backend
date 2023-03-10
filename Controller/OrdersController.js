@@ -162,7 +162,7 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                     .catch(error => {
                                         console.log(error);
                                     })
-                            }
+                            }                            
                         })
                         .catch(error => {
                             console.log(error);
