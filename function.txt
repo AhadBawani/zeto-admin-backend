@@ -1,0 +1,28 @@
+let url = http://localhost:5000/
+
+User
+    -LOGIN (LOGIN USING PHONENUMBER AND PASSWORD)  --DONE          url + /User/Login        (POST)
+    -SIGNUP                                        --DONE          url + /User/Signup       (POST)
+    -GET USER BY ID                                --DONE          url + /User/:userId      (GET)
+    -EDIT USER PHONE NUMBER                        --DONE          url + /User/:userId      (PATCH)
+
+
+Products
+    -GET ALL PRODUCT                               --DONE          url + /Product                      (GET)
+    -ADD PRODUCT                                   --DONE          url + /Product                      (POST)    
+    -DELETE PRODUCT                                --DONE          url + /Product/:productId           (DELETE)
+    -DISABLE PRODUCT                               --DONE          url + /Product/:productId           (PATCH)
+
+
+User Cart
+    -GET USER CART                                 --DONE          url + /UserCart/:userId                     (GET)
+    -ADD CART TO USER                              --DONE          url + /UserCart/                            (POST)
+    -INCREASE QUANTITY OF THE CART                 --DONE          url + /UserCart/AddQuantity/:cartId         (PATCH)
+    -DECREASE QUANTITY OF THE CART                 --DONE          url + /UserCart/RemoveQuantity/:cartId      (PATCH)
+    -REMOVE CART                                   --DONE          url + /UserCart/:cartId                     (DELETE)
+
+
+Orders
+    -GET ORDER BY USER ID                          --DONE          url + /Orders/:userId                (GET)
+    -PLACE ORDER                                   --DONE          url + /Orders/                       (POST)
+    -DELIVER ORDER                                 --DONE          url + /Orders/Delivered/:orderId     (PATCH)
