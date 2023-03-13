@@ -20,7 +20,7 @@ const scheduler = require('./Utils/scheduler');
 const path = require('path');
 require('dotenv/config');
 
-process.env.TZ = 'IST';
+process.env.TZ = 'Asia/Kolkata';
 var dir = path.join(__dirname, "Images");
 app.use(express.static(dir));
 app.use(cors());
