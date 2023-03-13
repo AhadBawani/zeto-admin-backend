@@ -6,58 +6,16 @@ const ProductSchema = require('../Schemas/ProductSchema');
 require('dotenv/config');
 
 module.exports.GET_USER_ORDER = (async (req, res) => {
-    const userId = req.params.userId;
-    const arr = [];
-    User.findById(userId)
+    User.findById(req.params.userId)
         .exec()
         .then(response => {
             if (response) {
-                Order.find({ userId: userId })
+                Order.find({ userId: req.params.userId })
                     .populate('productId')
                     .exec()
                     .then(response => {
-                        if (response.length) {
-                            for (let i = 0; i < response.length; i++) {
-                                const orderProduct = [];
-                                const orderPrice = [];
-                                const orderQauntity = [];
-                                const order = response.filter((item) => item?.orderId === response[i].orderId);
-                                order.map((item) => {
-                                    orderProduct.push({
-                                        productId: item.productId._id,
-                                        productName: item.productId.productName,
-                                        productImage: item.productId.productImage,
-                                        price: item.productId.price,
-                                        mrp: item.productId.mrp,
-                                        discount: item.productId.discount,
-                                        disabled: item.productId.disabled
-                                    });
-                                    orderQauntity.push(item.quantity);
-                                    orderPrice.push(item.productId.price);
-                                })
-
-                                const obj = {
-                                    orderId: response[i].orderId,
-                                    product: orderProduct,
-                                    price: orderPrice,
-                                    quantity: orderQauntity,
-                                    block: response[i].block,
-                                    room: response[i].room,
-                                    date: response[i].date,
-                                    orderDelivered: response[i].orderDelivered,
-                                    orderReview: response[i].orderReview,
-                                    deleteOrder: response[i].deleteOrder
-                                }
-
-                                arr.push(obj);
-                            }
-                            const userOrders = [...new Map(arr.map(v => [v.orderId, v])).values()];
-                            res.status(200).send(userOrders);
-                        }
-                        else {
-                            res.status(200).send({
-                                message: "No user orders!"
-                            })
+                        if (response) {
+                            res.status(200).json(response)
                         }
                     })
                     .catch(error => {
@@ -110,11 +68,19 @@ module.exports.DELETE_ORDER = (async (req, res) => {
 })
 
 module.exports.PLACE_ORDER = (async (req, res) => {
-    const { userId, product, block, room, paymentType, orderDelivered, date } = req.body;
+    const { userId, product, block, room, paymentType, orderDelivered } = req.body;
+    let { date } = req.body;
     const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(today.getDate() + 1);
+    var changeDate = null;
     const currentHour = today.getHours();
+    if ((currentHour > process.env.LAST_ORDER_TIME) | (currentHour == process.env.LAST_ORDER_TIME && today.getMinutes() > 1)) {
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+        changeDate = tomorrow.getDate() + "/" + ((tomorrow.getMonth() + 1) > 10 ? tomorrow.getMonth() + 1 : "0" + (tomorrow.getMonth() + 1)) + "/" + tomorrow.getFullYear();
+    }
+    else {
+        changeDate = date;
+    }
     try {
         User.findById(userId)
             .then(async userResponse => {
@@ -143,8 +109,8 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                                                 room: room,
                                                                 paymentType: paymentType,
                                                                 orderDelivered: orderDelivered,
-                                                                date: (currentHour > process.env.LAST_ORDER_TIME) | (currentHour == process.env.LAST_ORDER_TIME && today.getMinutes() > 1) ? tomorrow.getDate() + "/" + ((tomorrow.getMonth() + 1) > 10 ? tomorrow.getMonth() + 1 : "0" + (tomorrow.getMonth() + 1)) + "/" + tomorrow.getFullYear() : date
-                                                            }).save();
+                                                                date: changeDate,
+                                                            }).save();                                                            
                                                         }
                                                         else {
                                                             res.status(400).send({
@@ -176,7 +142,7 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                                                 room: room,
                                                                 paymentType: paymentType,
                                                                 orderDelivered: orderDelivered,
-                                                                date: (currentHour > process.env.LAST_ORDER_TIME) | (currentHour == process.env.LAST_ORDER_TIME && today.getMinutes() > 1) ? tomorrow.getDate() + "/" + ((tomorrow.getMonth() + 1) > 10 ? tomorrow.getMonth() + 1 : "0" + (tomorrow.getMonth() + 1)) + "/" + tomorrow.getFullYear() : date
+                                                                date: changeDate,
                                                             }).save();
                                                         }
                                                         else {
