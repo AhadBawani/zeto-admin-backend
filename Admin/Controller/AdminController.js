@@ -36,6 +36,7 @@ module.exports.GET_ALL_ORDERS = (async (req, res) => {
 
                                     const obj = {
                                         orderId: response[i].orderId,
+                                        inovoice:response[i].invoice,
                                         user: {
                                             username: response[i].userId.username,
                                             phoneNumber: response[i].userId.phoneNumber,

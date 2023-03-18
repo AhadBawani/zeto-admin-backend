@@ -38,6 +38,7 @@ module.exports.GET_USER_ORDER = (async (req, res) => {
 
                                 const obj = {
                                     orderId: response[i].orderId,
+                                    invoice:response[i].invoice,
                                     product: orderProduct,
                                     price: orderPrice,
                                     quantity: orderQauntity,
