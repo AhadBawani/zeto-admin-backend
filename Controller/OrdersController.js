@@ -136,8 +136,8 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                     .exec()
                                     .then(orderResponse => {
                                         if (orderResponse) {
-                                            const orderInvoice = orderResponse.invoice.split('-');
-                                            const increInvoice = (parseInt(orderInvoice[1]) + 1).toString().padStart(4, '0');                                                                                        
+                                            const orderInvoice = orderResponse.invoice ? orderResponse.invoice.split('-') : "0000";
+                                            const increInvoice = (parseInt(orderInvoice[1]) + 1).toString().padStart(4, '0');
                                             for (let i = 0; i < product.length; i++) {
                                                 ProductSchema.findById(product[i].productId)
                                                     .exec()
