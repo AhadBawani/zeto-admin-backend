@@ -26,6 +26,9 @@ const OrderSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    time : {
+        type:String        
+    },
     block: {
         type: String,
         required: true

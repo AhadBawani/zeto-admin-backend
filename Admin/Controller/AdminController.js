@@ -48,6 +48,7 @@ module.exports.GET_ALL_ORDERS = (async (req, res) => {
                                         block: response[i].block,
                                         room: response[i].room,
                                         date: response[i].date,
+                                        time: response[i].time,
                                         deliveryRate: response[i].deliveryRate,
                                         total: (orderPrice.map((v, i) => v * orderQauntity[i]).reduce((x, y) => x + y, 0) + response[i].deliveryRate),
                                         orderDelivered: response[i].orderDelivered,

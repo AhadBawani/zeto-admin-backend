@@ -38,18 +38,18 @@ module.exports.GET_USER_ORDER = (async (req, res) => {
 
                                 const obj = {
                                     orderId: response[i].orderId,
-                                    invoice:response[i].invoice,
+                                    invoice: response[i].invoice,
                                     product: orderProduct,
                                     price: orderPrice,
                                     quantity: orderQauntity,
                                     block: response[i].block,
                                     room: response[i].room,
                                     date: response[i].date,
+                                    time: response[i].time,
                                     orderDelivered: response[i].orderDelivered,
                                     orderReview: response[i].orderReview,
                                     deleteOrder: response[i].deleteOrder
                                 }
-
                                 arr.push(obj);
                             }
                             const userOrders = [...new Map(arr.map(v => [v.orderId, v])).values()];
@@ -113,7 +113,7 @@ module.exports.DELETE_ORDER = (async (req, res) => {
 module.exports.PLACE_ORDER = (async (req, res) => {
     const { userId, product, block, room, paymentType, orderDelivered } = req.body;
     let { date } = req.body;
-    const today = new Date();    
+    const today = new Date();
     var changeDate = null;
     const currentHour = today.getHours();
     if ((currentHour > process.env.LAST_ORDER_TIME) | (currentHour == process.env.LAST_ORDER_TIME && today.getMinutes() > 1)) {
@@ -124,7 +124,14 @@ module.exports.PLACE_ORDER = (async (req, res) => {
     else {
         changeDate = date;
     }
-    
+    var hours = today.getHours();
+    var minutes = today.getMinutes();
+    var ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    var strTime = hours + ':' + minutes + ' ' + ampm;
+
     try {
         User.findById(userId)
             .then(async userResponse => {
@@ -147,7 +154,7 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                                             const orderId = (orderResponse.orderId + 1);
                                                             const order = new Order({
                                                                 orderId: orderId,
-                                                                invoice:process.env.INV_PRE +  increInvoice + "-" +orderId.toString().substr(-4),
+                                                                invoice: process.env.INV_PRE + increInvoice + "-" + orderId.toString().substr(-4),
                                                                 userId: userId,
                                                                 productId: product[i]?.productId,
                                                                 quantity: product[i]?.quantity,
@@ -158,6 +165,7 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                                                 paymentType: paymentType,
                                                                 orderDelivered: orderDelivered,
                                                                 date: changeDate,
+                                                                time: strTime
                                                             }).save();
                                                         }
                                                         else {
@@ -180,7 +188,7 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                                         if (productResponse) {
                                                             const order = new Order({
                                                                 orderId: process.env.START_ORDER,
-                                                                invoice:process.env.INV_PRE + "0000" + "-"+process.env.START_ORDER.toString().substr(-4),
+                                                                invoice: process.env.INV_PRE + "0000" + "-" + process.env.START_ORDER.toString().substr(-4),
                                                                 userId: userId,
                                                                 productId: product[i]?.productId,
                                                                 quantity: product[i]?.quantity,
@@ -191,6 +199,7 @@ module.exports.PLACE_ORDER = (async (req, res) => {
                                                                 paymentType: paymentType,
                                                                 orderDelivered: orderDelivered,
                                                                 date: changeDate,
+                                                                time: strTime
                                                             }).save();
                                                         }
                                                         else {

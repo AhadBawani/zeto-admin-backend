@@ -5,21 +5,6 @@ const UserEmailVerification = require('../Schemas/UserEmailVerification');
 const UserSchema = require('../Schemas/UserSchema');
 require('dotenv/config');
 
-module.exports.GET_ALL_USER = (async (req, res) => {
-    try {
-        await User.find()
-            .exec()
-            .then(response => {
-                if (response) {
-                    res.status(200).json(response)
-                }
-            })
-            .catch();
-    }
-    catch (err) {
-        res.send("error : ", err);
-    }
-})
 
 module.exports.GET_USER_BY_ID = (async (req, res) => {
     try {
