@@ -1,5 +1,6 @@
 const Orders = require('../../Schemas/OrderSchema');
 const Product = require('../../Schemas/ProductSchema');
+const UserCartSchema = require('../../Schemas/UserCartSchema');
 const UserSchema = require('../../Schemas/UserSchema');
 const utils = require('../AdminUtils/Common/CommonUtils');
 
@@ -36,7 +37,7 @@ module.exports.GET_ALL_ORDERS = (async (req, res) => {
 
                                     const obj = {
                                         orderId: response[i].orderId,
-                                        inovoice:response[i].invoice,
+                                        inovoice: response[i].invoice,
                                         user: {
                                             username: response[i].userId.username,
                                             phoneNumber: response[i].userId.phoneNumber,
@@ -333,5 +334,61 @@ module.exports.DELETE_PRODUCT = (async (req, res) => {
     }
     catch (err) {
         res.send("Error : ", err);
+    }
+})
+
+module.exports.DELETE_PRODUCT = (async (req, res) => {
+    const { userId, productId } = req.params;
+    try {
+        utils.VERIFY_USER(userId)
+            .then((response) => {
+                if (response) {
+                    Product.findById(productId)
+                        .then((productResponse) => {
+                            if (productResponse) {
+                                Product.findByIdAndUpdate(productId, { deleteProduct: true })
+                                    .then(response => {
+                                        if (response.deleteProduct === true) {
+                                            res.status(200).send({
+                                                message: "Product already deleted!"
+                                            })
+                                        }
+                                        else {
+                                            UserCartSchema.deleteMany({ productId: productId })
+                                                .exec()
+                                                .then(response => {
+                                                    console.log(response);
+                                                })
+                                                .catch(error => {
+                                                    console.log(error);
+                                                });
+                                            if (response) {
+                                                res.status(200).send({
+                                                    message: "Product Deleted Successfully!"
+                                                })
+                                            }
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.log(error);
+                                    })
+                            }
+                            else {
+                                res.status(404).send({
+                                    message: "Product not found!"
+                                })
+                            }
+                        })
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+                res.status(403).send({
+                    message: "Permission Denied!"
+                })
+            })
+    }
+    catch (error) {
+        console.log(error);
     }
 })

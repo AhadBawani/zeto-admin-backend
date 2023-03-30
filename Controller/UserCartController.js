@@ -47,8 +47,8 @@ module.exports.ADD_USER_CART = (async (req, res) => {
                 if (userResponse) {
                     ProductSchema.findById(productId)
                         .exec()
-                        .then(productResponse => {
-                            if (productResponse) {
+                        .then(productResponse => {                            
+                            if (productResponse && productResponse.deleteProduct === false) {
                                 UserCartSchema.findOne({ userId: userId }).sort({ id: -1 })
                                     .exec()
                                     .then(userCartResponse => {
@@ -56,7 +56,7 @@ module.exports.ADD_USER_CART = (async (req, res) => {
                                             if (userCartResponse.currentSellerId === productResponse.sellerID) {
                                                 if (userCartResponse.productId === productId) {
                                                     UserCartSchema.
-                                                        findByIdAndUpdate(userCartResponse.id, { $inc: { 'quantity': 1 } }, { new: true }, (error, response) => {
+                                                        findByIdAndUpdate(userCartResponse.id, { $inc: { 'quantity': quantity } }, { new: true }, (error, response) => {
                                                             if (response) {
                                                                 res.status(200).send({
                                                                     message: "Updated Successfully"

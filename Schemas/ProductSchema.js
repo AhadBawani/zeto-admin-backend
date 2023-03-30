@@ -43,6 +43,10 @@ const ProductSchema = mongoose.Schema({
     disabled:{
         type:Boolean,
         required:true
+    },
+    deleteProduct:{
+        type:Boolean,
+        default:false
     }
 })
 

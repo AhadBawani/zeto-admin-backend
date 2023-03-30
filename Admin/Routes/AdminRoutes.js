@@ -18,6 +18,6 @@ router.post('/', upload.single('productImage'), AdminController.ADD_PRODUCT);
 router.patch('/DisabledProduct/:productId/:result/:adminUserId', AdminController.EDIT_DISABLED_PRODUCT);
 router.delete('/deleteUser/:adminUserId/:userId', AdminController.DELETE_USER);
 router.put('/EditProduct/:productId', upload.single('productImage'), AdminController.EDIT_PRODUCT);
-
+router.delete('/DeleteProduct/:userId/:productId', AdminController.DELETE_PRODUCT);
 
 module.exports = router;
