@@ -39,7 +39,7 @@ module.exports.GET_USER_CART = (async (req, res) => {
 
 module.exports.ADD_USER_CART = (async (req, res) => {
     const { userId, productId, quantity } = req.body;
-
+    
     try {
         await UserSchema.findById(userId)
             .exec()
@@ -56,7 +56,7 @@ module.exports.ADD_USER_CART = (async (req, res) => {
                                             if (userCartResponse.currentSellerId === productResponse.sellerID) {
                                                 if (userCartResponse.productId === productId) {
                                                     UserCartSchema.
-                                                        findByIdAndUpdate(userCartResponse.id, { $inc: { 'quantity': quantity } }, { new: true }, (error, response) => {
+                                                        findByIdAndUpdate(userCartResponse.id, { $inc: { 'quantity': parseInt(quantity) } }, { new: true }, (error, response) => {
                                                             if (response) {
                                                                 res.status(200).send({
                                                                     message: "Updated Successfully"
