@@ -8,7 +8,7 @@ const CategorySchema = require('../../Schemas/CategorySchema');
 module.exports.GET_ALL_SELLER = (async (req, res) => {
     try {
         const arr = [];
-        let seller = await Seller.find().select('_id sellerName sellerImage date categoryId').populate('categoryId', 'category');
+        let seller = await Seller.find({ disabled : false }).select('_id sellerName sellerImage date categoryId').populate('categoryId', 'category');
 
         for (let i = 0; i < seller.length; i++) {
             const sellerReview = await SellerReviewSchema.find({ sellerId: seller[i]?._id, deleteReview: false }).populate('userId', 'email username phoneNumber');
